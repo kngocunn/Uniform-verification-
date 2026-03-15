@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Driver Verification</title>
+
+<style>
+
+html, body{
+margin:0;
+padding:0;
+height:100vh;
+overflow:hidden;
+}
+
+.checkmark-circle{
+width:80px;
+height:80px;
+border-radius:50%;
+background:#28a745;
+margin:0 auto 20px auto;
+position:relative;
+animation:popCircle 0.4s ease;
+}
+
+.checkmark{
+position:absolute;
+top:50%;
+left:50%;
+
+width:24px;
+height:12px;
+
+border-left:5px solid white;
+border-bottom:5px solid white;
+
+transform:translate(-55%, -60%) rotate(-45deg);
+
+animation:drawCheck 0.4s 0.4s forwards;
+opacity:0;
+}
+
+@keyframes popCircle{
+0%{
+transform:scale(0);
+}
+80%{
+transform:scale(1.1);
+}
+100%{
+transform:scale(1);
+}
+}
+
+@keyframes drawCheck{
+0%{
+opacity:0;
+transform:scale(0) rotate(-45deg);
+}
+100%{
+opacity:1;
+transform:scale(1) rotate(-45deg);
+}
+
+}
+body{
+font-family: Arial;
+background-image:url("background.png");
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+}
+
+.form-box{
+position:absolute;
+left:80px;
+top:50%;
+transform:translateY(-50%);
+background:rgba(255,255,255,0.85);
+padding:10px;
+border-radius:12px;
+width:350px;
+height:520px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+text-align:center;
+}
+
+input, button{
+padding:10px;
+margin:10px;
+}
+
+@keyframes popupShow{
+0%{
+transform:scale(0.6) translateY(40px);
+opacity:0;
+}
+
+100%{
+transform:scale(1) translateY(0);
+opacity:1;
+}
+
+}
+.verify-btn{
+cursor:pointer;
+background:#007bff;
+color:white;
+border:2px solid #004aad;
+padding:12px 25px;
+font-size:16px;
+border-radius:8px;
+display:block;
+margin:20px auto;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+transition:0.2s;
+}
+
+.verify-btn:hover{
+background:#0056d2;
+transform:translateY(-2px);
+}
+
+.upload-box{
+position:relative;
+width:180px;
+height:280px;
+border:2px dashed #aaa;
+border-radius:10px;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:center;
+background:white;
+cursor:pointer;
+}
+
+.upload-box:hover{
+border-color:#ff6600;
+background:#fff5f0;
+}
+
+#uploadLabel{
+position:absolute;
+width:100%;
+height:100%;
+top:0;
+left:0;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+#preview{
+position:absolute;
+width:100%;
+height:100%;
+object-fit:cover;
+border-radius:10px;
+display:none;
+}
+
+.close-btn{
+position:absolute;
+
+top:6px;
+right:6px;
+
+width:26px;
+height:26px;
+
+background:none;
+border:none;
+box-shadow:none;
+margin:0;
+padding:0;
+
+color:black;
+font-size:20px;
+font-weight:bold;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+cursor:pointer;
+transition:0.2s;
+}
+
+.close-btn:hover{
+color:red;
+}
+
+#removeBtn{
+display:none;
+}
+
+#result{
+margin-top:20px;
+background:#f3f3f3;
+padding:10px;
+display:none;
+text-align:left;
+}
+
+.popup-overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:1000;
+}
+
+.popup-box{
+background:white;
+padding:25px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+
+width:320px;
+
+transform:scale(0.7);
+opacity:0;
+animation:popupShow 0.4s ease forwards;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="successPopup" class="popup-overlay">
+
+<div class="popup-box">
+
+<div class="checkmark-circle">
+
+<svg class="checkmark-svg" viewBox="0 0 52 52">
+<path d="M14 27 L22 35 L38 19" 
+stroke="white" 
+stroke-width="5" 
+fill="none" 
+stroke-linecap="round" 
+stroke-linejoin="round"/>
+</svg>
+
+</div>
+
+<h2>Xác thực thành công</h2>
+<p>Tài xế đã được xác thực</p>
+
+<button class="verify-btn" onclick="closePopup()">Xác nhận</button>
+
+</div>
+
+</div>
+
+<div class="form-box">
+
+<h2>Driver Verification System</h2>
+
+<input type="text" id="drv_id" placeholder="Enter Your Phone Number">
+
+<div class="upload-box">
+
+<input type="file" id="image" onchange="previewImage()" hidden>
+
+<label for="image" id="uploadLabel">
+Chọn ảnh
+</label>
+
+<img id="preview">
+
+<button id="removeBtn" class="close-btn" onclick="removeImage()">✖</button>
+
+</div>
+
+<button class="verify-btn" onclick="upload()">Xác thực</button>
+
+<pre id="result"></pre>
+
+</div>
+
+<script>
+
+function resetForm(){
+
+document.getElementById("drv_id").value=""
+
+let img=document.getElementById("preview")
+let label=document.getElementById("uploadLabel")
+let remove=document.getElementById("removeBtn")
+let input=document.getElementById("image")
+
+input.value=""
+
+img.style.display="none"
+label.style.display="flex"
+remove.style.display="none"
+
+}
+function showPopup(){
+document.getElementById("successPopup").style.display="flex"
+}
+
+function closePopup(){
+document.getElementById("successPopup").style.display="none"
+}
+
+function previewImage(){
+
+let file=document.getElementById("image").files[0]
+
+if(file){
+
+let img=document.getElementById("preview")
+let label=document.getElementById("uploadLabel")
+let remove=document.getElementById("removeBtn")
+
+img.src=URL.createObjectURL(file)
+img.style.display="block"
+
+label.style.display="none"
+remove.style.display="block"
+
+}
+
+}
+
+function removeImage(){
+
+let img=document.getElementById("preview")
+let label=document.getElementById("uploadLabel")
+let remove=document.getElementById("removeBtn")
+let input=document.getElementById("image")
+
+input.value=""
+
+img.style.display="none"
+label.style.display="flex"
+remove.style.display="none"
+
+}
+
+async function upload(){
+
+let drv_id=document.getElementById("drv_id").value
+let file=document.getElementById("image").files[0]
+
+if(!drv_id){
+alert("Please enter Driver ID")
+return
+}
+
+if(!file){
+alert("Please choose an image")
+return
+}
+
+let formData=new FormData()
+formData.append("drv_id",drv_id)
+formData.append("file",file)
+
+try{
+
+let response=await fetch("http://127.0.0.1:8000/verify-driver",{
+method:"POST",
+body:formData
+})
+
+let data=await response.json()
+
+showPopup()
+
+resetForm()
+
+result.style.display="none"
+}catch(error){
+
+result.innerText="Error: Cannot connect to API"
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
