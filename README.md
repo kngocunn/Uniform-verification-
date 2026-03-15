@@ -54,7 +54,7 @@ The project connects to a local MySQL instance (default: `localhost:3307`, datab
 - **`drive`**: Tracks the overall status of the drivers. Includes `num_violation` and `status_account`. If a driver fails the validation check making their `num_violation > 3`, their account is automatically marked as `deactive`.
 
 ## How to Run the Project Locally
-Dowload models in this link bellow: https://drive.google.com/file/d/16sLCOpv3y7v31T1YPaTh8JLDpxdasbFv/view?usp=drive_link. Then creat a folder in backend/models. unzip all models in folder models
+Dowload models in this link bellow: https://drive.google.com/file/d/16sLCOpv3y7v31T1YPaTh8JLDpxdasbFv/view?usp=drive_link. Then creat a folder in .../backend/models, unzip all models in folder .../backend/models.
 1. **Clone the repository and enter the backend directory**:
    ```bash
    cd Main/backend
